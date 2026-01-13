@@ -45,45 +45,22 @@ BankBot follows a **local Retrieval-Augmented Generation (RAG) pipeline**:
 
    * If no relevant context exists, the model is instructed to refuse or redirect safely.
 
-+------------------------+
-|     User / Browser     |
-+-----------+------------+
-            |
-            v
-+------------------------+
-|     Streamlit UI       |
-|   (Chat Interface)     |
-+-----------+------------+
-            |
-            v
-+------------------------+
-|    Python Backend      |
-|   (Orchestration)      |
-+-----+-----------+------+
-      |           |
-      |           |
-      v           v
-+-----------+   +----------------------+
-| Sentence  |   |   Prompt Builder     |
-|Transformer|   | (Rules + Context)    |
-+-----+-----+   +----------+-----------+
-      |                    |
-      v                    v
-+------------------+   +----------------------+
-|    ChromaDB      |   |     LLM Engine       |
-| (Vector Store)   |   | (Llama 3 via Ollama) |
-+------------------+   +----------+-----------+
-                                   |
-                                   v
-                        +----------------------+
-                        |   Generated Answer   |
-                        +----------------------+
-                                   |
-                                   v
-+------------------------+
-|     Streamlit UI       |
-|  (Response Display)    |
-+------------------------+
+flowchart TD
+    U[User / Browser] --> UI[Streamlit UI<br/>(Chat Interface)]
+
+    UI --> BE[Python Backend<br/>(Orchestration Layer)]
+
+    BE -->|Embed Query| ST[SentenceTransformers]
+    ST -->|Vector Search| DB[ChromaDB<br/>(Vector Store)]
+
+    DB -->|Relevant Context| PB[Prompt Builder<br/>(Rules + Context)]
+    BE --> PB
+
+    PB -->|Final Prompt| LLM[Llama 3<br/>(via Ollama)]
+
+    LLM -->|Generated Response| BE
+    BE --> UI
+
 
 ---
 
